@@ -31,6 +31,7 @@ import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -47,6 +48,7 @@ public abstract class MixinChatHud implements IChatHud {
     @Shadow private int scrolledLines;
     @Shadow private boolean hasUnreadNewMessages;
 
+    @Unique
     private AbstractChatTab tab;
 
     @Shadow
@@ -56,7 +58,7 @@ public abstract class MixinChatHud implements IChatHud {
     public abstract double getChatScale();
 
     @Shadow
-    protected abstract boolean isChatFocused();
+    public abstract boolean isChatFocused();
 
     @Shadow
     public abstract void scroll(int amount);
@@ -73,7 +75,7 @@ public abstract class MixinChatHud implements IChatHud {
     }
 
     @Inject(at = @At("HEAD"), method = "render", cancellable = true)
-    private void render(DrawContext context, int delta, int mouseX, int mouseY, CallbackInfo ci) {
+    private void render(DrawContext context, int currentTick, int mouseX, int mouseY, boolean focused, CallbackInfo ci) {
         // Ignore rendering vanilla chat if disabled
         if (!HudConfigStorage.General.VANILLA_HUD.config.getBooleanValue()) {
             ci.cancel();
